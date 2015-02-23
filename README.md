@@ -1,7 +1,6 @@
 # Loki - a logging utility for Swift
 
-> I have brought you a gift! I only ask for one thing in return;
->
+> I have brought you a gift! I only ask for one thing in return;  
 > a good seat from which to watch Asgard burn. - *[Loki](http://www.imdb.com/character/ch0039559/quotes)*
 
 ## Note
