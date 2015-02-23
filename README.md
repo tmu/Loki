@@ -1,11 +1,17 @@
 # Loki - a logging utility for Swift
 
 > I have brought you a gift! I only ask for one thing in return;
+>
 > a good seat from which to watch Asgard burn. - *[Loki](http://www.imdb.com/character/ch0039559/quotes)*
+
+## Note
+
+I haven't yet published Loki officially and a proper documentation is thus lacking.
+You can start to use it if you want. This is the initial 0.1 version of Loki but
+it's functional.
 
 ## Rationale
 
-TODO
 
 Loki is a simple to use, but powerful logging tool for Swift
 
@@ -15,7 +21,7 @@ Loki is a simple to use, but powerful logging tool for Swift
 - indented logging to visualize the structure of callstack
 - enable or disable the logging by module
 - logging code can be left to the production code and has minimal effect on the performance when turned off
-
+- multithread support
 
 ## Indended logging 
 
