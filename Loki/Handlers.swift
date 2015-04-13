@@ -67,7 +67,7 @@ public class FileHandler : Handler {
     public init?(path: String) {
         self.path = path
         
-        let queue_label = "loki.filehandler." + NSString(format:"%2X", path.hashValue)
+        let queue_label = "loki.filehandler." + String(format:"%2X", path.hashValue)
         self.queue = dispatch_queue_create(queue_label, nil)
         
         let fm = NSFileManager.defaultManager()
@@ -75,7 +75,8 @@ public class FileHandler : Handler {
         // Create the log file
         if !fm.fileExistsAtPath(path) {
             if !NSFileManager.defaultManager().createFileAtPath(path, contents: nil, attributes: nil) {
-                NSLog("Couldn't create a file %s", path)
+                NSLog("Couldn't create a file %@", path)
+                self.file = nil
                 return nil
             }
         }
@@ -84,7 +85,9 @@ public class FileHandler : Handler {
         if let handle =  NSFileHandle(forWritingAtPath: path) {
             self.file = handle
         } else {
-            NSLog("Couldn't open a file %@", file)
+            NSLog("Couldn't open a file %@", path)
+            self.file = nil
+            
             return nil
         }
     }

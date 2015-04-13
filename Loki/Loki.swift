@@ -152,14 +152,14 @@ public class Logger {
         return config.should_log(level:level, file: file)
     }
 
-    func log(msg: @autoclosure() -> String) {
+    func log(@autoclosure msg: () -> String) {
         let txt = self.indentation() + msg()
         for handler in handlers {
             handler.log(txt)
         }
     }
     
-    func checked_log(#msg: @autoclosure() -> String, file: String, level: LogLevel) {
+    func checked_log(@autoclosure #msg: () -> String, file: String, level: LogLevel) {
         if !config.should_log(level:level, file:file) { return }
         log(msg)
     }
@@ -182,23 +182,23 @@ public class Logger {
         }
     }
 
-    public func error(msg : @autoclosure() -> String, file: String = __FILE__) -> () {
+    public func error(@autoclosure msg : () -> String, file: String = __FILE__) -> () {
         checked_log(msg: msg, file: file, level: .Error)
     }
 
-    public func warning(msg : @autoclosure() -> String, file: String = __FILE__) -> () {
+    public func warning(@autoclosure msg : () -> String, file: String = __FILE__) -> () {
         checked_log(msg: msg, file: file, level: .Warning)
     }
 
-    public func info(msg : @autoclosure() -> String, file: String = __FILE__) -> () {
+    public func info(@autoclosure msg : () -> String, file: String = __FILE__) -> () {
         checked_log(msg: msg, file: file, level: .Info)
     }
 
-    public func debug(msg : @autoclosure() -> String, file: String = __FILE__) -> () {
+    public func debug(@autoclosure msg : () -> String, file: String = __FILE__) -> () {
         checked_log(msg: msg, file: file, level: .Debug)
     }
 
-    public func trace(msg : @autoclosure() -> String, file: String = __FILE__) -> () {
+    public func trace(@autoclosure msg : () -> String, file: String = __FILE__) -> () {
         checked_log(msg: msg, file: file, level: .Trace)
     }
     
@@ -280,23 +280,23 @@ public var rootLogger = Logger(config: Config())
 
 #if LOKI_ON
     public struct Loki {
-        public static func error(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func error(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.error(msg, file:file)
         }
     
-        public static func warning(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func warning(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.warning(msg, file:file)
         }
 
-        public static func info(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func info(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.info(msg, file:file)
         }
     
-        public static func debug(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func debug(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.debug(msg, file:file)
         }
     
-        public static func trace(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func trace(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.trace(msg, file:file)
         }
         
@@ -321,19 +321,19 @@ public var rootLogger = Logger(config: Config())
     }
 #else
     public struct Loki {
-        public static func error(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func error(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
     
-        public static func warning(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func warning(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
     
-        public static func info(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func info(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
     
-        public static func debug(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func debug(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
     
-        public static func trace(msg : @autoclosure() -> String, file: String = __FILE__) {
+        public static func trace(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
     
         public static func function(function: String = __FUNCTION__,
