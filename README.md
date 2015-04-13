@@ -22,6 +22,15 @@ Loki is a simple to use, but powerful logging tool for Swift
 - logging code can be left to the production code and has minimal effect on the performance when turned off
 - multithread support
 
+## Installation
+
+Swift frameworks are supported by CocoaPods 0.36.0.beta.2. Loki is not yet in official Cocoapods directory,
+but you can add Loki to your `Podfile` by using explicit git repository reference:
+
+```
+pod 'Loki', :git => "https://github.com/tmu/Loki.git"
+```
+
 ## Indended logging 
 
 Assume you have the following code in `main.swift` file
