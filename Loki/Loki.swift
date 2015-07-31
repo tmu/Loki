@@ -39,23 +39,24 @@ public protocol Handler {
 public class Config {
     // Configuration options that you want to tweak
     public var logLevel: LogLevel = .Trace
-    
+
     // Configuration options that you usually don't want to tweak
     public var indentation_per_scope = 2
     public var indentation_character = " "
     public var scope_in_symbol = "->"
     public var scope_out_symbol = "<-"
-    
+
     // TODO(tmu): should be sets really. Will change when Swift 1.2 is out of beta.
     var include_modules: [String: Void]? = nil
     var exclude_modules: [String: Void]? = nil
 
     public init() {
     }
-    
+
     public func include(module: String) {
         if var modules = include_modules {
             modules[module] = ()
+            include_modules = modules
         } else {
             include_modules = [module: ()]
         }
@@ -64,6 +65,7 @@ public class Config {
     public func exclude(module: String) {
         if var modules = exclude_modules {
             modules[module] = ()
+            exclude_modules = modules
         } else {
             exclude_modules = [module: ()]
         }
@@ -85,7 +87,7 @@ public class Config {
         // TODO(tmu): this could be enabled and disabled separately
         return should_log_file(file)
     }
-    
+
     private func should_log(#level: LogLevel, file: String) -> Bool {
         if level.rawValue > logLevel.rawValue {
             return false
@@ -95,18 +97,18 @@ public class Config {
     }
 }
 
-/* 
+/*
  * Scopestack is a thread-specific object (see scopestack getter in Logger).
- * Currently it stores only the depth of scope stack (for the indentation) 
+ * Currently it stores only the depth of scope stack (for the indentation)
  * but could store the full scope stack, if that turns out to be useful
  */
 class Scopestack {
     var scope_depth = 0
-    
+
     func push() {
         scope_depth += 1
     }
-    
+
     func pop() {
         scope_depth -= 1
     }
@@ -114,7 +116,7 @@ class Scopestack {
 
 
 /*
- * Logger orchestrates the logging. 
+ * Logger orchestrates the logging.
  * Actual logging is done by handlers, which there can be several.
  * Scopestack is thread-specific data and is stored in thread-local storage (TLS)
  * using NSThread.threadDictionary.
@@ -125,13 +127,13 @@ public class Logger {
 
     private let name: String
     private let scopestack_tls_key: String
-    
+
     public init(config: Config) {
         self.config = config
         self.name = NSUUID().description
         self.scopestack_tls_key = "loki.scopestack." + self.name
     }
-    
+
     var scopestack: Scopestack {
         let tls = NSThread.currentThread().threadDictionary
         if let callstack = tls[scopestack_tls_key] as? Scopestack {
@@ -142,12 +144,12 @@ public class Logger {
             return callstack
         }
     }
-    
+
     func indentation() -> String {
         let depth = scopestack.scope_depth
         return config.indentation_character.times(config.indentation_per_scope*depth)
     }
-    
+
     func should_log(#level:LogLevel, file: String) -> Bool {
         return config.should_log(level:level, file: file)
     }
@@ -158,7 +160,7 @@ public class Logger {
             handler.log(txt)
         }
     }
-    
+
     func checked_log(@autoclosure #msg: () -> String, file: String, level: LogLevel) {
         if !config.should_log(level:level, file:file) { return }
         log(msg)
@@ -201,7 +203,7 @@ public class Logger {
     public func trace(@autoclosure msg : () -> String, file: String = __FILE__) -> () {
         checked_log(msg: msg, file: file, level: .Trace)
     }
-    
+
     public func function(
         function: String = __FUNCTION__,
         file: String = __FILE__,
@@ -235,13 +237,13 @@ public class Scope {
         let name: String
         let thread_id: mach_port_t
         let isMainThread: Bool
-        
+
         let function: String
         let file: String
         let line: Int
         let column: Int
-        
-        
+
+
         func long_format() -> String {
             if isMainThread {
                 return "[main] \(module):\(line) \(function) \(name)"
@@ -250,10 +252,10 @@ public class Scope {
             }
         }
     }
-    
+
     let details: Details
     let logger: Logger
-    
+
     init(
         logger: Logger,
         name: String = String(),
@@ -270,7 +272,7 @@ public class Scope {
                               function:function, file:file, line:line, column:column)
             logger.scope_in(self)
     }
-    
+
     deinit {
         logger.scope_out(self)
     }
@@ -283,7 +285,7 @@ public var rootLogger = Logger(config: Config())
         public static func error(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.error(msg, file:file)
         }
-    
+
         public static func warning(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.warning(msg, file:file)
         }
@@ -291,15 +293,15 @@ public var rootLogger = Logger(config: Config())
         public static func info(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.info(msg, file:file)
         }
-    
+
         public static func debug(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.debug(msg, file:file)
         }
-    
+
         public static func trace(@autoclosure msg: () -> String, file: String = __FILE__) {
             rootLogger.trace(msg, file:file)
         }
-        
+
         public static func function(function: String = __FUNCTION__,
             file: String = __FILE__,
             line: Int = __LINE__,
@@ -307,7 +309,7 @@ public var rootLogger = Logger(config: Config())
         {
             return rootLogger.function(function: function, file:file, line:line, column:column)
         }
-    
+
         public static func scope(
             name: String,
             function: String = __FUNCTION__,
@@ -323,19 +325,19 @@ public var rootLogger = Logger(config: Config())
     public struct Loki {
         public static func error(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
-    
+
         public static func warning(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
-    
+
         public static func info(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
-    
+
         public static func debug(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
-    
+
         public static func trace(@autoclosure msg: () -> String, file: String = __FILE__) {
         }
-    
+
         public static func function(function: String = __FUNCTION__,
             file: String = __FILE__,
             line: Int = __LINE__,
@@ -343,7 +345,7 @@ public var rootLogger = Logger(config: Config())
         {
             return nil
         }
-        
+
         public static func scope(
             name: String,
             function: String = __FUNCTION__,
