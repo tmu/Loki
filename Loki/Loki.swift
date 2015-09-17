@@ -72,7 +72,9 @@ public class Config {
     }
 
     private func should_log_file(file: String) -> Bool {
-        let module = file.lastPathComponent
+        guard let module = NSURL(fileURLWithPath: file).lastPathComponent else {
+            return false
+        }
         var should = true
         if let modules = include_modules {
             should = modules[module] != nil
@@ -88,7 +90,7 @@ public class Config {
         return should_log_file(file)
     }
 
-    private func should_log(#level: LogLevel, file: String) -> Bool {
+    private func should_log(level level: LogLevel, file: String) -> Bool {
         if level.rawValue > logLevel.rawValue {
             return false
         } else {
@@ -150,7 +152,7 @@ public class Logger {
         return config.indentation_character.times(config.indentation_per_scope*depth)
     }
 
-    func should_log(#level:LogLevel, file: String) -> Bool {
+    func should_log(level level:LogLevel, file: String) -> Bool {
         return config.should_log(level:level, file: file)
     }
 
@@ -161,7 +163,7 @@ public class Logger {
         }
     }
 
-    func checked_log(@autoclosure #msg: () -> String, file: String, level: LogLevel) {
+    func checked_log(@autoclosure msg msg: () -> String, file: String, level: LogLevel) {
         if !config.should_log(level:level, file:file) { return }
         log(msg)
     }
@@ -267,7 +269,7 @@ public class Scope {
             // TODO(tmu): Get a thread id once for a thread-specific logger
             let thread_id = pthread_mach_thread_np(pthread_self())
             // TODO(tmu): Better module names with something like project root relative paths
-            let module = file.lastPathComponent
+            let module = NSURL(fileURLWithPath: file).lastPathComponent!
             details = Details(module: module, name: name, thread_id: thread_id, isMainThread: NSThread.isMainThread(),
                               function:function, file:file, line:line, column:column)
             logger.scope_in(self)
@@ -307,7 +309,7 @@ public var rootLogger = Logger(config: Config())
             line: Int = __LINE__,
             column: Int = __COLUMN__) -> Scope?
         {
-            return rootLogger.function(function: function, file:file, line:line, column:column)
+            return rootLogger.function(function, file:file, line:line, column:column)
         }
 
         public static func scope(

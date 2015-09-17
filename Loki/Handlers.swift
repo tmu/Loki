@@ -38,7 +38,7 @@ public class PrintHandler : Handler {
     public func log(msg: String) {
         // Logging from multiple threads has to be synchronized, here we do it with dispatch_sync.
         synchronized {
-            println(msg)
+            print(msg)
         }
     }
 }
